@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Saboaria Dona de Mim — Produção e Precificação</title>
+<style>
+
+:root{--pink:#e7a8b6;--pink2:#f8dfe5;--rose:#c96f82;--beige:#f6efe6;--cream:#fffdf9;--sage:#cfe2d0;--sage2:#e8f2e7;--babyblue:#dcecf2;--ink:#573f45;--muted:#806d73;--line:#eadbd5;--gold:#c7a46b;--danger:#c84c58;--ok:#4e8a63}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#fbf8f4;color:var(--ink)}
+button,input,select{font:inherit}.hidden{display:none!important}
+.auth{min-height:100vh;background:linear-gradient(135deg,#fff7fb,#f7eee4,#eaf3eb);display:grid;place-items:center;padding:24px}
+.authbox{width:min(460px,100%);background:#fff;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:0 16px 45px #76545b18}
+.authbrand{text-align:center;margin-bottom:22px}.authlogo{width:110px;height:110px;margin:auto;display:block;object-fit:contain}.brandLogo{width:58px;height:58px;display:block;object-fit:contain;flex:0 0 auto}.brandTag{font-size:10px;color:#a05b70;margin-top:2px;display:block}
+.authbrand h1{font:30px Georgia,serif;margin:12px 0 4px}.authbrand p{color:var(--muted);margin:0}
+.authbox h2{font:22px Georgia,serif;margin:18px 0}.authfield{margin:12px 0}.authfield label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}.authfield input{width:100%;padding:12px;border:1px solid #ddcdd7;border-radius:12px}
+.authmsg{padding:10px 12px;border-radius:10px;background:#fff0f3;color:#9f2934;margin:12px 0;font-size:13px}.authnote{font-size:12px;color:var(--muted);line-height:1.5;margin-top:16px}
+.app{display:flex;min-height:100vh;background:#fbf8f4}.side{width:278px;background:linear-gradient(180deg,#fff1f3 0%,#f9eee8 55%,#eef5ed 100%);border-right:1px solid #eadbd5;padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto;z-index:20}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 18px}.brand b{font:22px Georgia,serif;color:#6d4049;display:block}.brand small{display:block;color:#8b7378;margin-top:2px}.brand .brandLogo{width:74px;height:74px}
+.nav button{width:100%;border:0;background:transparent;text-align:left;padding:11px 13px;border-radius:13px;color:#5d464c;font-size:14px;cursor:pointer;margin:2px 0}.nav button:hover,.nav button.active{background:#f3cfd7;box-shadow:inset 3px 0 0 #c96f82;font-weight:700}.nav .section{font-size:10px;letter-spacing:.15em;color:#a27880;margin:15px 8px 5px;font-weight:700}
+.supportLink{display:flex;align-items:center;gap:9px;margin:20px 4px 8px;text-decoration:none;color:#fff;background:#39a96b;padding:12px 14px;border-radius:13px;font-size:14px;box-shadow:0 5px 14px #32985d2a}.supportLink:hover{background:#2f955e}
+.main{flex:1;min-width:0}.top{height:84px;padding:12px 28px;border-bottom:1px solid #eadbd5;background:rgba(255,253,249,.96);display:flex;justify-content:space-between;gap:20px;align-items:center;position:sticky;top:0;z-index:15}.top h1{margin:0;font:31px Georgia,serif;color:#68474e}.top p{margin:3px 0 0;color:var(--muted);font-size:12px}.topbrand{display:flex;align-items:center;gap:12px;min-width:300px}.topbrand .miniLogo{width:46px;height:46px;object-fit:contain}.hamb{width:42px;height:42px;border:0;background:#fae9e6;border-radius:50%;font-size:22px;color:#7b515a;cursor:pointer}.topsearch{display:flex;align-items:center;gap:8px;border:1px solid #eadbd5;background:#fff;border-radius:13px;padding:0 13px;width:min(360px,35vw);height:43px;color:#9a858b}.topsearch input{border:0;outline:0;width:100%;background:transparent;color:var(--ink)}.topright{display:flex;gap:9px;align-items:center}.userpill{font-size:12px;color:#674e55;padding:9px 11px;background:#fff7f8;border:1px solid var(--line);border-radius:12px}.topUser{display:flex;align-items:center;gap:9px}.avatar{width:39px;height:39px;border-radius:50%;display:grid;place-items:center;background:#f2c8d1;color:#754a54;font-size:18px}.iconBtn{width:40px;height:40px;border:1px solid #eadbd5;background:#fff;border-radius:50%;cursor:pointer;color:#785b63}
+.content{padding:22px 28px 55px;max-width:1600px;margin:auto}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 2px 8px #6b455010}.card .label{color:var(--muted);font-size:13px}.metric{font:28px Georgia,serif;margin-top:8px}
+.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:18px 0;flex-wrap:wrap}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:600}.primary{background:#d98798;color:#fff}.secondary{background:#f4ebe6;color:#654d54}.danger{background:#fee5e7;color:#9f2934}.input,.select{border:1px solid #ddcdd7;border-radius:10px;padding:10px 12px;background:#fff;min-height:40px}.search{min-width:300px;flex:1}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}.table{width:max-content;min-width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:10px;border-bottom:1px solid #f0e6eb;text-align:left;white-space:nowrap}.table th{background:#fff7fa;position:sticky;top:0;z-index:1}.status{display:inline-block;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:700}.status.ok{background:#e4f3e8;color:#327047}.status.buy{background:#ffe1e4;color:#a82f3d}
+.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.field input,.field select{width:100%}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:18px}.candleHero{background:linear-gradient(135deg,#fff8fb,#f8e4ed);border:1px solid #ead1dc;border-radius:20px;padding:22px;margin-bottom:18px}.candleHero h2{font:30px Georgia,serif;margin:4px 0 8px;color:#8f3d60}.candleHero p{margin:0;color:var(--muted);line-height:1.55}.candleCards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.candleCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;min-height:180px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 4px 16px #6b45500d}.candleIcon{width:54px;height:54px;border-radius:16px;background:#fff0f5;display:grid;place-items:center;font-size:27px;margin-bottom:12px}.candleCard h3{font:20px Georgia,serif;margin:0 0 6px}.candleCard p{font-size:12px;color:var(--muted);margin:0 0 14px}
+.empty{text-align:center;padding:55px;color:var(--muted)}.notice{padding:12px 14px;border-radius:12px;background:#f7eef3;margin:12px 0;color:#644f5e}.right{text-align:right}.money{font-family:Georgia,serif}.modal{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;padding:20px;z-index:30}.modal.show{display:flex}.modalbox{background:#fff;border-radius:18px;max-width:1000px;width:100%;max-height:92vh;overflow:auto;padding:22px}.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h2{font:26px Georgia,serif;margin:0}.close{border:0;background:#eee;border-radius:50%;width:34px;height:34px;cursor:pointer}
+/* Novo dashboard visual */
+.dashboardHero{min-height:218px;background:linear-gradient(110deg,#fff8f4 0%,#f8e8e6 47%,#e8f0e6 100%);border:1px solid #eadbd5;border-radius:20px;padding:31px 36px;margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 7px 22px #79535b0c}.dashboardHero:before{content:'✿';position:absolute;right:210px;top:22px;font-size:42px;color:#d8b9ae;opacity:.55}.dashboardHero:after{content:'❀';position:absolute;right:28px;bottom:-20px;font-size:118px;color:#c6d7c5;opacity:.6}.dashboardHero .eyebrow{font-size:11px;letter-spacing:.16em;color:#9d6672;font-weight:700}.dashboardHero h2{font:38px Georgia,serif;color:#68474e;margin:7px 0 9px}.dashboardHero p{font-size:15px;color:#765f66;margin:0;max-width:710px;line-height:1.55}.heroLogoMark{position:absolute;right:72px;top:50%;transform:translateY(-50%);width:150px;height:150px;object-fit:contain;opacity:.95}
+.dashStats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.dashStat{background:#fff;border:1px solid #eadbd5;border-radius:17px;padding:16px 17px;display:flex;align-items:center;gap:13px;box-shadow:0 3px 12px #6b45500b}.dashIcon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:22px;flex:0 0 auto}.dashStat:nth-child(1) .dashIcon{background:#f9dfe5}.dashStat:nth-child(2) .dashIcon{background:#e5efe2}.dashStat:nth-child(3) .dashIcon{background:#f5eadb}.dashStat:nth-child(4) .dashIcon{background:#dfeef2}.dashStat .label{font-size:12px;color:#816c72}.dashStat .metric{font-size:26px;margin-top:3px;color:#594349}
+.quickGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.quickCard{background:#fff;border:1px solid #eadbd5;border-radius:17px;padding:14px 12px;min-height:145px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 14px #6b45500b;cursor:pointer;transition:.15s}.quickCard:hover{transform:translateY(-2px);box-shadow:0 8px 20px #6b455016}.quickCard:nth-child(1){background:#fff1f3}.quickCard:nth-child(2){background:#fff5e9}.quickCard:nth-child(3){background:#f3f0f7}.quickCard:nth-child(4){background:#fff1ee}.quickCard:nth-child(5){background:#edf5ec}.quickCard:nth-child(6){background:#eef5f6}.quickIcon{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;background:#fff;font-size:28px;margin-bottom:10px;box-shadow:0 2px 7px #6b45500a}.quickCard h3{font:17px Georgia,serif;margin:0 0 3px}.quickCard p{font-size:11px;color:var(--muted);margin:0}.dashLower{display:grid;grid-template-columns:1.15fr .85fr 1fr;gap:14px;margin-top:18px}.dashPanel{background:#fff;border:1px solid #eadbd5;border-radius:17px;padding:18px;box-shadow:0 4px 14px #6b45500b}.dashPanel h3{font:20px Georgia,serif;margin:0 0 12px;color:#62474e}.dashPanelHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}.soldRow{display:grid;grid-template-columns:38px 1fr 52px;gap:9px;align-items:center;padding:8px 0;border-bottom:1px solid #f1e8e3}.soldThumb{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#f7d4dc,#efe7d9);display:grid;place-items:center;font-size:18px}.soldName{font-size:13px}.bar{height:8px;background:#f3ece9;border-radius:99px;margin-top:5px;overflow:hidden}.bar i{display:block;height:100%;background:#e49aa8;border-radius:99px}.soldNum{text-align:right;font-weight:700;font-size:12px;color:#77535c}.profitBox{display:flex;align-items:center;justify-content:center;gap:18px;min-height:210px}.donut{width:130px;height:130px;border-radius:50%;background:conic-gradient(#a9cda9 0 67%,#e5a2ad 67% 100%);position:relative}.donut:after{content:'';position:absolute;inset:23px;border-radius:50%;background:#fff}.donutCenter{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-weight:700;font-size:20px;z-index:1}.legend{font-size:12px;color:#715d63;line-height:1.8}.legend b{color:#5b454c;font-size:14px}.dueRow{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #f1e8e3;font-size:12px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px;background:#a8cda8}.dot.warn{background:#e4b85f}.dot.alert{background:#dd8e9b}.dashFooter{margin-top:18px;background:linear-gradient(100deg,#fff1ee,#f7e7e7,#e8f0e7);border:1px solid #eadbd5;border-radius:17px;padding:18px 24px;text-align:center;font:24px Georgia,serif;color:#805661}
+.recipeDashGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.recipeDashCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;min-height:156px;box-shadow:0 4px 14px #6b45500b;border-top:4px solid #b85b83}.recipeDashCard:nth-child(4n+2){border-top-color:#9e7ac5}.recipeDashCard:nth-child(4n+3){border-top-color:#6fa383}.recipeDashCard:nth-child(4n+4){border-top-color:#c99b60}.recipeDashIcon{width:46px;height:46px;border-radius:14px;background:#fff1f6;display:grid;place-items:center;font-size:23px;margin-bottom:12px}.recipeDashCard h3{font:19px Georgia,serif;margin:0 0 5px}.recipeDashCard p{font-size:12px;color:var(--muted);margin:0 0 13px}
+@media(max-width:1200px){.quickGrid{grid-template-columns:repeat(3,1fr)}.dashLower{grid-template-columns:1fr 1fr}.dashLower .dashPanel:last-child{grid-column:1/-1}.heroLogoMark{right:30px;opacity:.35}}@media(max-width:1050px){.side{width:230px}.dashStats{grid-template-columns:repeat(2,1fr)}.quickGrid{grid-template-columns:repeat(3,1fr)}.recipeDashGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:900px){.topsearch{display:none}.topbrand{min-width:0}.top{padding-left:16px;padding-right:16px}.content{padding-left:16px;padding-right:16px}.dashLower{grid-template-columns:1fr}.dashLower .dashPanel:last-child{grid-column:auto}.formgrid{grid-template-columns:1fr 1fr}}@media(max-width:650px){.app{display:block}.side{width:100%;height:auto;position:fixed;left:-100%;top:0;bottom:0;transition:left .2s}.app.menuOpen .side{left:0}.nav{display:block}.top{height:72px}.topbrand .miniLogo{display:none}.top h1{font-size:25px}.topright .userpill{display:none}.content{padding:14px}.grid,.formgrid,.dashStats,.quickGrid,.recipeDashGrid{grid-template-columns:1fr}.dashboardHero{padding:23px;min-height:230px}.dashboardHero h2{font-size:29px}.heroLogoMark{right:-18px;bottom:-10px;top:auto;transform:none;width:145px;opacity:.22}.dashFooter{font-size:19px}.dashLower{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="auth">
+  <div class="authbox">
+    <div class="authbrand"><img class="authlogo" src="assets/logo-dona-de-mim.svg" alt="Dona de Mim — sabonetes e velas"><h1>Dona de Mim</h1><p>Saboaria artesanal</p><div style="font-size:12px;color:#a64b70;margin-top:6px">Sabonetes • Velas • Bem-estar</div></div>
+    <div id="loginBox">
+      <h2>Entrar</h2>
+      <div class="authfield"><label>E-mail</label><input id="loginEmail" type="email" autocomplete="username"></div>
+      <div class="authfield"><label>Senha</label><input id="loginPass" type="password" autocomplete="current-password"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0 12px;font-size:13px;color:#806f7d"><label style="display:flex;align-items:center;gap:7px;cursor:pointer"><input id="rememberMe" type="checkbox" checked> Lembrar de mim</label><button type="button" class="btn secondary" style="padding:7px 10px;font-size:12px" onclick="forgotPassword()">Esqueci minha senha</button></div>
+      <div id="loginMsg" class="authmsg hidden"></div>
+      <button class="btn primary" style="width:100%" onclick="login()">Entrar</button>
+      <button class="btn secondary" style="width:100%;margin-top:8px" onclick="showSignup()">Criar meu cadastro</button>
+      <div style="text-align:center;margin-top:18px;font-size:12px;color:#8a6b7c;line-height:1.5">Desenvolvido por <strong>Regina Martinelli</strong><br>@saboariadonademim</div>
+    </div>
+    <div id="signupBox" class="hidden">
+      <h2>Criar cadastro</h2>
+      <div class="authfield"><label>Nome</label><input id="signupName" type="text"></div>
+      <div class="authfield"><label>E-mail</label><input id="signupEmail" type="email" autocomplete="username"></div>
+      <div class="authfield"><label>Senha</label><input id="signupPass" type="password" autocomplete="new-password"></div>
+      <div id="signupMsg" class="authmsg hidden"></div>
+      <button class="btn primary" style="width:100%" onclick="signup()">Criar cadastro</button>
+      <button class="btn secondary" style="width:100%;margin-top:8px" onclick="showLogin()">Voltar para entrar</button>
+    </div>
+    <div id="resetBox" class="hidden">
+      <h2>Nova senha</h2>
+      <p class="small">Digite a nova senha para concluir a recuperação da sua conta.</p>
+      <div class="authfield"><label>Nova senha</label><input id="newPassword" type="password" autocomplete="new-password"></div>
+      <div id="resetMsg" class="authmsg hidden"></div>
+      <button class="btn primary" style="width:100%" onclick="updatePassword()">Salvar nova senha</button>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+<aside class="side">
+  <div class="brand"><img class="brandLogo" src="assets/logo-dona-de-mim.svg" alt="Dona de Mim"><div><b>Dona de Mim</b><small>Saboaria artesanal</small><span class="brandTag">Sabonetes • Velas • Bem-estar</span></div></div>
+  <div class="nav">
+    <div class="section">GESTÃO</div>
+    <button data-page="dashboard" class="active">▦ Dashboard</button>
+    <button data-page="saboaria">▣ Dados da Saboaria</button>
+    <button data-page="insumos">⚗ Insumos</button>
+    <button data-page="embalagens">◇ Banco de Embalagens</button>
+    <div class="section">PRODUÇÃO</div>
+    <button data-page="receitas">🧼 Minhas Receitas</button>
+    <button data-page="velas">🕯️ Receitas de Velas</button>
+    <button data-page="preco">▤ Preço Final</button>
+    <div class="section">SISTEMA</div>
+    <button data-page="config">⚙ Configurações</button>
+    <a class="supportLink" href="https://wa.me/5511998932710?text=Olá%20Saboaria%20Dona%20de%20Mim%2C%20preciso%20de%20ajuda%20com%20o%20sistema." target="_blank" rel="noopener">💬 <strong>Suporte via WhatsApp</strong></a>
+  </div>
+</aside>
+<main class="main">
+  <header class="top">
+    <div class="topbrand"><button class="hamb" onclick="toggleMenu()" aria-label="Abrir menu">☰</button><img class="miniLogo" src="assets/logo-dona-de-mim.svg" alt="Dona de Mim"><div><h1 id="title">Dashboard</h1><p id="subtitle">Visão geral da produção, estoque e precificação.</p></div></div>
+    <div class="topsearch">⌕<input id="globalSearch" placeholder="Buscar produto, insumo ou lote..." onkeydown="if(event.key==='Enter') globalSearchGo(this.value)"></div>
+    <div class="topright"><button class="iconBtn" title="Notificações">♧</button><div class="topUser"><div class="avatar">👤</div><span id="userPill" class="userpill"></span></div><button class="btn secondary" onclick="exportBackup()">⬇ Backup</button><button class="btn secondary" onclick="logout()">Sair</button></div>
+  </header>
+  <section class="content" id="content"></section>
+</main>
+</div>
+
+<div class="modal" id="insumoModal">
+ <div class="modalbox">
+  <div class="modalhead"><h2 id="insumoModalTitle">Adicionar insumo</h2><button class="close" onclick="closeModal('insumoModal')">×</button></div>
+  <p>Preencha os mesmos campos da sua planilha. Os campos calculados serão atualizados automaticamente.</p>
+  <div class="formgrid">
+    <div class="field"><label>Nome do Insumo</label><input id="iNome" class="input"></div>
+    <div class="field"><label>Categoria</label><input id="iCategoria" class="input"></div>
+    <div class="field"><label>Fornecedor</label><input id="iFornecedor" class="input"></div>
+    <div class="field"><label>Onde Comprei</label><input id="iOnde" class="input"></div>
+    <div class="field"><label>Qtd. Comprei</label><input id="iQtos" class="input" type="number" step="any"></div>
+    <div class="field"><label>Usei</label><input id="iUsei" class="input" type="number" step="any"></div>
+    <div class="field"><label>Lote do fornecedor</label><input id="iLote" class="input"></div>
+    <div class="field"><label>Comprei no dia</label><input id="iCompra" class="input" type="date"></div>
+    <div class="field"><label>Fabricação</label><input id="iFab" class="input" type="date"></div>
+    <div class="field"><label>Validade</label><input id="iValidade" class="input" type="date"></div>
+    <div class="field"><label>Valor</label><input id="iValor" class="input" type="number" step="0.01"></div>
+    <div class="field"><label>Peso</label><input id="iPeso" class="input" type="number" step="any"></div>
+    <div class="field"><label>Unidade de medida</label><select id="iUnidade" class="select"><option>g</option><option>kg</option><option>ml</option><option>l</option><option>un.</option></select></div>
+  </div>
+  <div class="actions" style="margin-top:16px"><button class="btn secondary" onclick="closeModal('insumoModal')">Cancelar</button><button class="btn primary" onclick="saveInsumoForm()">Salvar insumo</button></div>
+ </div>
+</div>
+
+<div class="modal" id="embModal">
+ <div class="modalbox">
+  <div class="modalhead"><h2 id="embModalTitle">Adicionar embalagem</h2><button class="close" onclick="closeModal('embModal')">×</button></div>
+  <p>Mesma lógica da sua planilha de embalagens. Estoque, valor fracionado e status são calculados automaticamente.</p>
+  <div class="formgrid">
+    <div class="field"><label>Embalagem</label><input id="eNome" class="input"></div>
+    <div class="field"><label>Categoria</label><input id="eCategoria" class="input"></div>
+    <div class="field"><label>Fornecedor</label><input id="eFornecedor" class="input"></div>
+    <div class="field"><label>Qtd. comprada</label><input id="eQtdComprada" class="input" type="number" step="any"></div>
+    <div class="field"><label>Qtd. por pacote</label><input id="eQtdPacote" class="input" type="number" step="any"></div>
+    <div class="field"><label>Unidade</label><input id="eUnidade" class="input" value="Un."></div>
+    <div class="field"><label>Valor total</label><input id="eValorTotal" class="input" type="number" step="0.01"></div>
+    <div class="field"><label>Usado</label><input id="eUsado" class="input" type="number" step="any"></div>
+  </div>
+  <div class="notice">Cálculo igual à planilha: <b>Valor fracionado = Valor total ÷ quantidade por pacote</b> e <b>Estoque = (Qtd. comprada × Qtd. por pacote) − usado</b>. Status: COMPRAR quando estoque ≤ 3.</div>
+  <div class="actions"><button class="btn secondary" onclick="closeModal('embModal')">Cancelar</button><button class="btn primary" onclick="saveEmbForm()">Salvar embalagem</button></div>
+ </div>
+</div>
+
+<div class="modal" id="recipeModal">
+ <div class="modalbox recipe-modal-box">
+  <div class="modalhead">
+   <div><div class="label">MINHAS RECEITAS</div><h2 id="recipeModalTitle">Nova receita</h2></div>
+   <button class="close" onclick="closeRecipeModal()">×</button>
+  </div>
+  <p class="small" style="margin:10px 0 18px">Cadastre o nome da receita e escolha a categoria.</p>
+  <div class="formgrid">
+   <div class="field"><label>Nome da receita</label><input id="recipeNameInput" class="input" placeholder="Ex.: Sabonete de Calêndula" autocomplete="off"></div>
+   <div class="field"><label>Categoria</label><select id="recipeCategoryInput" class="select"></select></div>
+  </div>
+  <div id="recipeModalMsg" class="authmsg hidden" style="margin-top:12px"></div>
+  <div class="actions" style="margin-top:18px;justify-content:flex-end">
+   <button class="btn secondary" onclick="closeRecipeModal()">Cancelar</button>
+   <button class="btn primary" onclick="saveRecipeModal()">Criar receita</button>
+  </div>
+ </div>
+</div>
+
+
+<script>
+const SUPABASE_URL='https://ntihiecnfilmppdypgpd.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_XNlEuf5RmT8X0Xr3Y94gqA_GTeRgEl7';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const USERS_KEY='saboaria_dona_de_mim_users_v1';
+const SESSION_KEY='saboaria_dona_de_mim_session_v1';
+const CATEGORIAS_RECEITAS=['Sabonetes','Sabonetes Mousse','Perfumes','Body Splash','Sais de Banho','Escaldas-pés','Aromatizadores de Ambiente','Água de Passar','Água de Lençóis','Shampoos','Condicionadores','Máscaras Capilares','Cuidados Faciais','Kits e Lembrancinhas','Velas Latinha','Velas Whisky','Velas Gruta','Velas para Rechaud'];
+const CATEGORIAS_VELAS=['Velas Latinha','Velas Whisky','Velas Gruta','Velas para Rechaud'];
+const EMPTY={saboaria:{nome:'Saboaria Dona de Mim',contato:'',endereco:'',cnpj:'',instagram:''},insumos:[],embalagens:[],precos:[],precificacao:{quantidadeProduzida:1,custoFixo:2.5,lucroDesejado:1.2,embalagens:[],qtdEmbalagem:1},receitas:[],receitaAtiva:null};
+let currentUser=null,state=structuredClone(EMPTY),editingInsumo=-1,editingEmb=-1,cloudTimer=null,cloudBusy=false;
+function normalizeState(raw){const x=raw&&typeof raw==='object'?raw:{};let receitas=Array.isArray(x.receitas)?x.receitas:[]; if(!receitas.length && Array.isArray(x.precos) && x.precos.length){receitas=[{id:'migrada-'+Date.now(),nome:'Receita anterior',categoria:'Sabonetes',precos:x.precos,precificacao:{...EMPTY.precificacao,...(x.precificacao||{}),embalagens:Array.isArray(x.precificacao?.embalagens)?x.precificacao.embalagens:[]}}]} return {...structuredClone(EMPTY),...x,saboaria:{...EMPTY.saboaria,...(x.saboaria||{})},insumos:Array.isArray(x.insumos)?x.insumos:[],embalagens:Array.isArray(x.embalagens)?x.embalagens:[],precos:Array.isArray(x.precos)?x.precos:[],precificacao:{...EMPTY.precificacao,...(x.precificacao||{}),embalagens:Array.isArray(x.precificacao?.embalagens)?x.precificacao.embalagens:[]},receitas,receitaAtiva:x.receitaAtiva||(receitas[0]?.id||null)}}
+function userDataKey(){return 'saboaria_dona_de_mim_data_'+(currentUser?.email||'local')}
+function loadLocalState(){state=normalizeState(JSON.parse(localStorage.getItem(userDataKey())||'null'))}
+function saveLocal(){localStorage.setItem(userDataKey(),JSON.stringify(state))}
+function save(){saveLocal();clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>syncCloud(),500)}
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function num(v){if(typeof v==='number')return v;if(v==null||v==='')return 0;let s=String(v).trim().replace(/R\$\s?/g,'').replace(/\./g,'').replace(',','.');return Number(s)||0}
+function dateBR(v){if(!v)return '';return String(v).slice(0,10)}
+function monthsTo(date){if(!date)return '';const d=new Date(date+'T00:00:00');if(isNaN(d))return '';const now=new Date();if(d<new Date(now.getFullYear(),now.getMonth(),now.getDate()))return 0;let m=(d.getFullYear()-now.getFullYear())*12+(d.getMonth()-now.getMonth());if(d.getDate()<now.getDate())m--;return Math.max(0,m)}
+function calcInsumo(x){x.disponivel=num(x.qtos)-num(x.usei);x.comprar=x.disponivel<1;x.mesesVencer=monthsTo(x.validade);x.precoFracionado=(x.valor!==''&&x.peso)?num(x.valor)/num(x.peso):0;return x}
+function calcEmb(x){x.valorFracionado=num(x.valorTotal)/Math.max(num(x.qtdPacote),1);x.estoque=num(x.qtdComprada)*num(x.qtdPacote)-num(x.usado);x.status=x.estoque<=3?'COMPRAR':'OK';return x}
+function showLogin(){document.getElementById('loginBox').classList.remove('hidden');document.getElementById('signupBox').classList.add('hidden');document.getElementById('resetBox').classList.add('hidden');hideMsg('loginMsg');hideMsg('signupMsg');hideMsg('resetMsg')}
+function showSignup(){document.getElementById('loginBox').classList.add('hidden');document.getElementById('signupBox').classList.remove('hidden');document.getElementById('resetBox').classList.add('hidden');hideMsg('loginMsg');hideMsg('signupMsg');hideMsg('resetMsg')}
+function showReset(){document.getElementById('loginBox').classList.add('hidden');document.getElementById('signupBox').classList.add('hidden');document.getElementById('resetBox').classList.remove('hidden')}
+function showMsg(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.remove('hidden')}
+function hideMsg(id){const e=document.getElementById(id);if(e)e.classList.add('hidden')}
+async function signup(){
+  const name=document.getElementById('signupName').value.trim(),email=document.getElementById('signupEmail').value.trim().toLowerCase(),pass=document.getElementById('signupPass').value;
+  if(!name||!email||pass.length<6)return showMsg('signupMsg','Preencha nome e e-mail e use uma senha com pelo menos 6 caracteres.');
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
+  if(error)return showMsg('signupMsg',error.message);
+  if(!data.session){showMsg('signupMsg','Cadastro criado. Verifique seu e-mail para confirmar a conta e depois entre no sistema.');return;}
+  await handleSession(data.session);
+}
+async function login(){
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase(),pass=document.getElementById('loginPass').value;
+  if(!email||!pass)return showMsg('loginMsg','Digite seu e-mail e sua senha.');
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error)return showMsg('loginMsg',error.message);
+  await handleSession(data.session);
+}
+async function forgotPassword(){
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  if(!email)return showMsg('loginMsg','Digite seu e-mail primeiro e clique novamente em “Esqueci minha senha”.');
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://saboaria-dona-de-mim-embalagens-202.vercel.app/'});
+  if(error)return showMsg('loginMsg',error.message);
+  showMsg('loginMsg','Enviamos um e-mail para redefinir sua senha. Verifique sua caixa de entrada.');
+}
+async function updatePassword(){
+  const pass=document.getElementById('newPassword').value;
+  if(pass.length<6)return showMsg('resetMsg','Use uma senha com pelo menos 6 caracteres.');
+  const {error}=await sb.auth.updateUser({password:pass});
+  if(error)return showMsg('resetMsg',error.message);
+  showMsg('resetMsg','Senha alterada com sucesso. Agora você pode entrar normalmente.');
+  setTimeout(()=>showLogin(),1200);
+}
+async function logout(){await sb.auth.signOut();localStorage.removeItem(SESSION_KEY);currentUser=null;state=structuredClone(EMPTY);document.getElementById('app').classList.add('hidden');document.getElementById('authScreen').classList.remove('hidden');showLogin()}
+async function handleSession(session){
+  if(!session?.user)return;
+  const u=session.user;currentUser={id:u.id,email:u.email||'',name:u.user_metadata?.name||u.email?.split('@')[0]||'Usuário'};
+  localStorage.setItem(SESSION_KEY,JSON.stringify(currentUser));
+  await loadCloudState();
+  enterApp();
+}
+async function loadCloudState(){
+  if(!currentUser?.id)return;
+  const uid=currentUser.id;
+  const [sR,iR,eR,rR,pR]=await Promise.all([
+    sb.from('dados_saboaria').select('*').eq('usuario_id',uid).order('id',{ascending:true}).limit(1),
+    sb.from('insumos').select('*').eq('usuario_id',uid).order('id',{ascending:true}),
+    sb.from('embalagens').select('*').eq('usuario_id',uid).order('id',{ascending:true}),
+    sb.from('receitas').select('*').eq('usuario_id',uid).order('id',{ascending:true}),
+    sb.from('precificacoes').select('*').eq('usuario_id',uid).order('id',{ascending:false}).limit(1)
+  ]);
+  const err=[sR,iR,eR,rR,pR].find(x=>x.error); if(err){loadLocalState();showMsg('loginMsg','Não foi possível carregar a nuvem agora. Seus dados locais foram mantidos.');return;}
+  const cloudHas=(iR.data?.length||0)+(eR.data?.length||0)+(rR.data?.length||0)+(sR.data?.length||0)+(pR.data?.length||0)>0;
+  if(!cloudHas){loadLocalState();await syncCloud(true);return;}
+  const insById=new Map((iR.data||[]).map(x=>[x.id,x.nome_insumo]));
+  const embById=new Map((eR.data||[]).map(x=>[x.id,x.embalagem]));
+  const recIds=(rR.data||[]).map(x=>x.id);
+  let ri=[],re=[];
+  if(recIds.length){const [a,b]=await Promise.all([sb.from('receita_insumos').select('*').in('receita_id',recIds),sb.from('receita_embalagens').select('*').in('receita_id',recIds)]);if(a.error||b.error){loadLocalState();return;}ri=a.data||[];re=b.data||[];}
+  state=normalizeState({saboaria:sR.data?.[0]?{nome:sR.data[0].nome_saboaria||'',contato:sR.data[0].whatsapp||'',instagram:sR.data[0].instagram||'',endereco:sR.data[0].endereco||'',cnpj:''}:EMPTY.saboaria,
+    insumos:(iR.data||[]).map(x=>calcInsumo({nome:x.nome_insumo||'',categoria:x.categoria||'',fornecedor:x.fornecedor||'',ondeComprei:x.onde_comprei||'',qtos:x.qtd_comprei||0,usei:x.usei||0,disponivel:x.disponivel,lote:x.lote_fornecedor||'',compra:x.comprei_no_dia||'',fabricacao:x.fabricacao||'',validade:x.validade||'',mesesVencer:x.meses_para_vencer,valor:x.valor||0,peso:x.peso||0,unidade:x.unidade_medida||'',precoFracionado:x.preco_fracionado})),
+    embalagens:(eR.data||[]).map(x=>calcEmb({embalagem:x.embalagem||'',categoria:x.categoria||'',fornecedor:x.fornecedor||'',qtdComprada:x.qtde_comprada||0,qtdPacote:x.qtde_por_pacote||0,unidade:x.unidade||'',valorTotal:x.valor_total||0,valorFracionado:x.valor_fracionado,usado:x.usado||0,estoque:x.estoque,status:x.status})),
+    receitas:[],precificacao:{...EMPTY.precificacao},precos:[]});
+  const recipes=(rR.data||[]).map(r=>({id:'cloud-'+r.id,nome:r.nome,categoria:r.categoria||'Sabonetes',observacoes:r.observacoes||'',precos:ri.filter(x=>x.receita_id===r.id).map(x=>({insumo:insById.get(x.insumo_id)||'',quantidade:x.quantidade||0,unidade:x.unidade||'g',fatorMl:1})),precificacao:{...EMPTY.precificacao}}));
+  for(const r of recipes){r.precificacao={...EMPTY.precificacao};const child=re.filter(x=>x.receita_id===Number(r.id.replace('cloud-','')));r.precificacao.embalagens=child.map(x=>embById.get(x.embalagem_id)||'').filter(Boolean);}
+  state.receitas=recipes;state.receitaAtiva=recipes[0]?.id||null;state.precos=recipes[0]?.precos||[];
+  if(pR.data?.[0]){const p=pR.data[0];state.precificacao={...EMPTY.precificacao,quantidadeProduzida:p.quantidade_produzida||1,custoFixo:p.custo_fixo||2.5,lucroDesejado:p.lucro_desejado??1.2};if(state.receitaAtiva){const rr=state.receitas[0];rr.precificacao={...state.precificacao};}}
+  saveLocal();
+}
+async function syncCloud(force=false){
+  if(!currentUser?.id||cloudBusy)return;
+  cloudBusy=true;const uid=currentUser.id;
+  try{
+    await sb.from('perfis').upsert({id:uid,nome:currentUser.name,email:currentUser.email});
+    await sb.from('receitas').delete().eq('usuario_id',uid);
+    await sb.from('precificacoes').delete().eq('usuario_id',uid);
+    await sb.from('insumos').delete().eq('usuario_id',uid);
+    await sb.from('embalagens').delete().eq('usuario_id',uid);
+    await sb.from('dados_saboaria').delete().eq('usuario_id',uid);
+    if(state.saboaria)await sb.from('dados_saboaria').insert({usuario_id:uid,nome_saboaria:state.saboaria.nome||'Saboaria Dona de Mim',proprietaria:currentUser.name,whatsapp:state.saboaria.contato||'',instagram:state.saboaria.instagram||'',email:currentUser.email,endereco:state.saboaria.endereco||''});
+    const insRows=state.insumos.map(x=>({usuario_id:uid,nome_insumo:x.nome||'',categoria:x.categoria||'',fornecedor:x.fornecedor||'',onde_comprei:x.ondeComprei||'',qtd_comprei:num(x.qtos),usei:num(x.usei),disponivel:num(x.disponivel),lembrar_comprar:x.comprar?'COMPRAR':'OK',lote_fornecedor:x.lote||'',comprei_no_dia:x.compra||null,fabricacao:x.fabricacao||null,validade:x.validade||null,meses_para_vencer:x.mesesVencer=== ''?null:num(x.mesesVencer),valor:num(x.valor),peso:num(x.peso),unidade_medida:x.unidade||'',preco_fracionado:num(x.precoFracionado)}));
+    const embRows=state.embalagens.map(x=>({usuario_id:uid,embalagem:x.embalagem||'',categoria:x.categoria||'',fornecedor:x.fornecedor||'',qtde_comprada:num(x.qtdComprada),qtde_por_pacote:num(x.qtdPacote),unidade:x.unidade||'',valor_total:num(x.valorTotal),valor_fracionado:num(x.valorFracionado),usado:num(x.usado),estoque:num(x.estoque),status:x.status||'OK'}));
+    const insMap=new Map(),embMap=new Map();
+    if(insRows.length){const {data,error}=await sb.from('insumos').insert(insRows).select('id,nome_insumo');if(error)throw error;(data||[]).forEach((x,i)=>insMap.set(state.insumos[i]?.nome,x.id));}
+    if(embRows.length){const {data,error}=await sb.from('embalagens').insert(embRows).select('id,embalagem');if(error)throw error;(data||[]).forEach((x,i)=>embMap.set(state.embalagens[i]?.embalagem,x.id));}
+    for(const r of state.receitas){const {data,error}=await sb.from('receitas').insert({usuario_id:uid,nome:r.nome||'Receita',categoria:r.categoria||'Sabonetes',observacoes:r.observacoes||''}).select('id').single();if(error)throw error;const rid=data.id;
+      const ris=(r.precos||[]).filter(x=>insMap.has(x.insumo)).map(x=>({receita_id:rid,insumo_id:insMap.get(x.insumo),quantidade:num(x.quantidade),unidade:x.unidade||'g'}));
+      const res=(r.precificacao?.embalagens||[]).filter(x=>embMap.has(x)).map(x=>({receita_id:rid,embalagem_id:embMap.get(x),quantidade:num(r.precificacao?.qtdEmbalagem||1)}));
+      if(ris.length)await sb.from('receita_insumos').insert(ris);if(res.length)await sb.from('receita_embalagens').insert(res);
+      const p=r.precificacao||EMPTY.precificacao;await sb.from('precificacoes').insert({usuario_id:uid,receita_id:rid,peso_final:0,quantidade_produzida:num(p.quantidadeProduzida||1),custo_total:0,custo_por_unidade:0,custo_fixo:num(p.custoFixo||2.5),custo_embalagens:0,lucro_desejado:num(p.lucroDesejado??1.2),preco_venda_sugerido:0});
+    }
+    saveLocal();
+  }catch(e){console.error('syncCloud',e);if(force)alert('A estrutura da nuvem está pronta, mas a primeira sincronização não terminou. Seus dados locais foram preservados.');}
+  finally{cloudBusy=false}
+}
+async function initCloud(){
+  sb.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'){showReset();return;} if(session&&!currentUser)await handleSession(session);});
+  const {data}=await sb.auth.getSession();if(data.session){await handleSession(data.session);return;}document.getElementById('authScreen').classList.remove('hidden');
+}
+function enterApp(){document.getElementById('authScreen').classList.add('hidden');document.getElementById('app').classList.remove('hidden');document.getElementById('userPill').textContent=currentUser.name+' · '+currentUser.email;setPage('dashboard')}
+
+function setPage(page){
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+ const meta={dashboard:['Dashboard','Visão geral da produção, estoque e precificação.'],saboaria:['Dados da Saboaria','Informações básicas da sua saboaria.'],insumos:['Insumos','Cadastre matérias-primas, acompanhe estoque, validade e custo fracionado.'],embalagens:['Banco de Embalagens','Controle de embalagens, estoque e custo unitário.'],receitas:['Minhas Receitas','Organize e guarde todas as suas receitas.'],velas:['Receitas de Velas','Crie, organize e precifique suas velas artesanais.'],preco:['Preço Final','Calcule o custo e o preço de venda da receita selecionada.'],config:['Configurações','Backup e dados locais deste cadastro.']};
+ document.getElementById('title').textContent=meta[page][0];document.getElementById('subtitle').textContent=meta[page][1];render(page)
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setPage(b.dataset.page));
+
+function render(page){const c=document.getElementById('content');if(page==='dashboard')return dashboard(c);if(page==='saboaria')return saboaria(c);if(page==='insumos')return insumos(c);if(page==='embalagens')return embalagens(c);if(page==='velas')return velasPage(c);if(page==='receitas')return receitasPage(c);if(page==='preco')return preco(c);config(c)}
+function dashboard(c){
+ const ins=(state.insumos||[]), emb=(state.embalagens||[]), rec=(state.receitas||[]);
+ const buy=ins.filter(x=>x.comprar).length+emb.filter(x=>x.status==='COMPRAR').length;
+ const totalCost=rec.reduce((sum,r)=>sum+(r.precificacao?.custoTotal||0),0);
+ const quick=[
+  ['🧼','Novo Produto','Cadastre uma nova receita','newRecipe()'],
+  ['🧮','Calcular Preço','Precifique sua receita','setPage(\'preco\')'],
+  ['🧴','Cadastrar Insumo','Matérias-primas e custos','openInsumo()'],
+  ['🎁','Cadastrar Embalagem','Controle de embalagens','openEmb()'],
+  ['🏷️','Gerar Rótulo','Acesse suas receitas','setPage(\'receitas\')'],
+  ['📦','Controle de Lote','Produção e validade','setPage(\'insumos\')']
+ ].map(x=>`<div class="quickCard" onclick="${x[3]}"><div class="quickIcon">${x[0]}</div><h3>${x[1]}</h3><p>${x[2]}</p></div>`).join('');
+ const sold=[...rec].sort((a,b)=>(b.precos||[]).length-(a.precos||[]).length).slice(0,5);
+ const maxSold=Math.max(1,...sold.map(r=>(r.precos||[]).length));
+ const soldHtml=(sold.length?sold.map((r,i)=>`<div class="soldRow"><div class="soldThumb">${['🧼','🧴','🕯️','🌸','🛁'][i%5]}</div><div><div class="soldName">${esc(r.nome)}</div><div class="bar"><i style="width:${Math.max(12,((r.precos||[]).length/maxSold)*100)}%"></i></div></div><div class="soldNum">${(r.precos||[]).length}</div></div>`).join(''):`<div class="empty" style="padding:25px">Cadastre suas primeiras receitas.</div>`);
+ const due=[...ins.filter(x=>x.validade).sort((a,b)=>String(a.validade).localeCompare(String(b.validade))),...emb.filter(x=>x.status==='COMPRAR')].slice(0,5);
+ const dueHtml=due.length?due.map((x,i)=>`<div class="dueRow"><span><span class="dot ${x.comprar?'alert':i===0?'warn':''}"></span>${esc(x.nome||x.embalagem)}</span><span>${x.validade?dateBR(x.validade):'Repor estoque'}</span></div>`).join(''):`<div class="empty" style="padding:25px">Nenhum vencimento próximo.</div>`;
+ c.innerHTML=`
+ <div class="dashboardHero"><div class="eyebrow">SISTEMA DE GESTÃO E PRECIFICAÇÃO</div><h2>Bem-vinda, ${esc(currentUser?.name||'Regina')}! <span style="color:#d98798">♥</span></h2><p>Aqui é a sua <b>Saboaria Dona de Mim</b>. Organize seus produtos, calcule preços, controle seus insumos e acompanhe o seu negócio em um só lugar.</p><img class="heroLogoMark" src="assets/logo-dona-de-mim.svg" alt="Logo Saboaria Dona de Mim"></div>
+ <div class="dashStats">
+   <div class="dashStat"><div class="dashIcon">🧴</div><div><div class="label">Produtos cadastrados</div><div class="metric">${rec.length}</div></div></div>
+   <div class="dashStat"><div class="dashIcon">🌿</div><div><div class="label">Insumos cadastrados</div><div class="metric">${ins.length}</div></div></div>
+   <div class="dashStat"><div class="dashIcon">💰</div><div><div class="label">Custo dos insumos</div><div class="metric">${money(ins.reduce((s,x)=>s+num(x.valor),0))}</div></div></div>
+   <div class="dashStat"><div class="dashIcon">📦</div><div><div class="label">Estoque / comprar</div><div class="metric">${buy}</div></div></div>
+ </div>
+ <div class="dashSection" style="margin-top:20px"><div class="dashPanelHead"><div><div class="eyebrow" style="font-size:10px;letter-spacing:.15em;color:#a05b78;font-weight:700">ACESSO RÁPIDO</div><h2 style="font:26px Georgia,serif;margin:3px 0">O que você deseja fazer?</h2></div><button class="btn primary" onclick="newRecipe()">＋ Nova receita</button></div><div class="quickGrid">${quick}</div></div>
+ <div class="dashLower">
+  <div class="dashPanel"><div class="dashPanelHead"><h3>Produtos mais utilizados</h3><span style="font-size:11px;color:#9a7a82">suas receitas</span></div>${soldHtml}</div>
+  <div class="dashPanel"><div class="dashPanelHead"><h3>Custos x Lucro</h3></div><div class="profitBox"><div class="donut"><div class="donutCenter">67%<small style="font-size:10px;font-weight:400"> margem</small></div></div><div class="legend"><div>● Custo de produção<br><b>${money(totalCost)}</b></div><div>● Lucro estimado<br><b>${money(Math.max(0,totalCost*1.5))}</b></div></div></div></div>
+  <div class="dashPanel"><div class="dashPanelHead"><h3>Próximos vencimentos</h3><span style="font-size:11px;color:#c56c7c">Ver todos</span></div>${dueHtml}</div>
+ </div>
+ <div class="dashFooter">♥ Artesanato que cuida, inspira e transforma ♥</div>`;
+}
+function toggleMenu(){document.getElementById('app').classList.toggle('menuOpen')}
+function globalSearchGo(v){const q=String(v||'').trim().toLowerCase();if(!q)return;const i=state.insumos.find(x=>String(x.nome||'').toLowerCase().includes(q)||String(x.lote||'').toLowerCase().includes(q));if(i){setPage('insumos');setTimeout(()=>{const el=document.getElementById('searchI');if(el){el.value=q;el.dispatchEvent(new Event('input'))}},0);return}const r=state.receitas.find(x=>String(x.nome||'').toLowerCase().includes(q));if(r){openRecipe(r.id);return}alert('Não encontrei produto, insumo ou lote com esse termo.')}
+function openRecipeCategory(cat){
+ const list=state.receitas.filter(r=>r.categoria===cat);
+ if(!list.length){const nome=prompt('Nome da nova receita em '+cat+':');if(!nome||!nome.trim())return;const r=receitaTemplate(nome.trim(),cat);state.receitas.push(r);loadRecipe(r.id);setPage('preco');return;}
+ persistActiveRecipe();
+ const html=`<div class="panel"><div class="toolbar"><div><div class="label">Minhas Receitas</div><h2 style="font-family:Georgia,serif;margin:4px 0">${esc(cat)}</h2></div><button class="btn secondary" onclick="setPage('dashboard')">← Voltar</button></div>${list.map(r=>`<div class="card" style="margin-top:12px"><div class="label">${esc(r.nome)}</div><div class="small" style="margin-top:5px">${(r.precos||[]).length} insumo(s)</div><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="openRecipe('${r.id}')">Abrir no Preço Final</button><button class="btn danger" onclick="deleteRecipe('${r.id}')">Excluir</button></div></div>`).join('')}<div class="actions" style="margin-top:14px"><button class="btn primary" onclick="newRecipeInCategory('${esc(cat)}')">＋ Nova receita em ${esc(cat)}</button></div></div>`;
+ c=document.getElementById('content');c.innerHTML=html;
+}
+function newRecipeInCategory(cat){openRecipeModal(cat)}
+
+function field(label,id,value){return `<div class="field"><label>${label}</label><input class="input" id="${id}" value="${esc(value||'')}"></div>`}
+function saboaria(c){const s=state.saboaria;c.innerHTML=`<div class="panel"><div class="formgrid">${field('Nome da Saboaria','sNome',s.nome)}${field('Contato','sContato',s.contato)}${field('Instagram','sInstagram',s.instagram)}${field('Endereço','sEndereco',s.endereco)}${field('CNPJ','sCnpj',s.cnpj)}</div><div class="actions" style="margin-top:16px"><button class="btn primary" onclick="saveSaboaria()">Salvar</button></div></div>`}
+function saveSaboaria(){state.saboaria={nome:document.getElementById('sNome').value,contato:document.getElementById('sContato').value,instagram:document.getElementById('sInstagram').value,endereco:document.getElementById('sEndereco').value,cnpj:document.getElementById('sCnpj').value};save();setPage('saboaria');alert('Dados salvos.')}
+
+function insumos(c){
+ const rows=state.insumos.map((x,i)=>`<tr><td>${esc(x.nome)}</td><td>${esc(x.categoria)}</td><td>${esc(x.fornecedor)}</td><td>${esc(x.ondeComprei)}</td><td>${num(x.qtos)}</td><td>${num(x.usei)}</td><td>${num(x.disponivel)}</td><td><span class="status ${x.comprar?'buy':'ok'}">${x.comprar?'COMPRAR':'OK'}</span></td><td>${esc(x.lote)}</td><td>${dateBR(x.compra)}</td><td>${dateBR(x.fabricacao)}</td><td>${dateBR(x.validade)}</td><td>${x.mesesVencer??''}</td><td>${money(x.valor)}</td><td>${num(x.peso)}</td><td>${esc(x.unidade)}</td><td>${money(x.precoFracionado)}</td><td><button class="btn secondary" onclick="editInsumo(${i})">Editar</button> <button class="btn danger" onclick="delInsumo(${i})">Excluir</button></td></tr>`).join('');
+ c.innerHTML=`<div class="toolbar"><input id="searchI" class="input search" placeholder="Buscar por nome, categoria, fornecedor ou lote" oninput="filterTable('searchI','it')"><div class="actions"><label class="btn secondary" style="cursor:pointer">⬆ Importar INSUMOS 2026<input type="file" accept=".xlsx,.xls" hidden onchange="importInsumosExcel(event)"></label><button class="btn primary" onclick="openInsumo()">＋ Adicionar insumo</button></div></div><div class="notice"><b>Cadastro manual:</b> os cálculos seguem a lógica da planilha: Disponível = Qtd. comprada − Usado; COMPRAR quando disponível &lt; 1; Meses para vencer pela validade; Preço fracionado = Valor ÷ Peso.</div><div class="tablewrap"><table class="table" id="it"><thead><tr><th>Nome do Insumo</th><th>Categoria</th><th>Fornecedor</th><th>Onde Comprei</th><th>Qtd. Comprei</th><th>Usei</th><th>Disponível</th><th>Lembrar de comprar</th><th>Lote do fornecedor</th><th>Comprei no dia</th><th>Fabricação</th><th>Validade</th><th>Meses para vencer</th><th>Valor</th><th>Peso</th><th>Unidade de medida</th><th>Preço fracionado</th><th>Ações</th></tr></thead><tbody>${rows||'<tr><td colspan="18" class="empty">Nenhum insumo cadastrado. Clique em “Adicionar insumo” para começar.</td></tr>'}</tbody></table></div>`
+}
+function excelDateToInput(v){
+ if(v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
+ if(typeof v==='number' && window.XLSX && XLSX.SSF){try{const d=XLSX.SSF.parse_date_code(v);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}catch(e){}}
+ if(typeof v==='string' && v.trim()){
+   const m=v.trim().match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);if(m){let y=Number(m[3]);if(y<100)y+=2000;return `${y}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`}
+   const d=new Date(v);if(!isNaN(d))return d.toISOString().slice(0,10);
+ }
+ return '';
+}
+function importInsumosExcel(event){
+ const file=event.target.files&&event.target.files[0];if(!file)return;
+ const input=event.target;input.value='';
+ const reader=new FileReader();
+ reader.onload=function(e){
+   try{
+     if(!window.XLSX){alert('Não foi possível carregar o leitor de Excel. Verifique sua conexão com a internet e tente novamente.');return;}
+     const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+     const ws=wb.Sheets[wb.SheetNames[0]];
+     const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
+     if(!rows.length){alert('A planilha está vazia.');return;}
+     const headers=rows[0].map(v=>String(v??'').trim().toLowerCase());
+     const idx=(...names)=>{for(const n of names){const i=headers.indexOf(n.toLowerCase());if(i>=0)return i}return -1};
+     const I={nome:idx('nome do insumo'),fornecedor:idx('fornecedor'),onde:idx('local da compra','onde comprei'),qtos:idx('comprei','qtd. comprei','qtd comprei','quantidade comprada'),usei:idx('usei'),lote:idx('lote do fornecedor'),compra:idx('comprei no dia'),fab:idx('fabricação','fabricacao'),validade:idx('validade'),valor:idx('valor'),peso:idx('peso'),unidade:idx('unidade de medida')};
+     if(I.nome<0){alert('Não encontrei a coluna “Nome do Insumo” na planilha.');return;}
+     const imported=[];
+     for(let r=1;r<rows.length;r++){
+       const row=rows[r];
+       const nome=row[I.nome];
+       if(nome===null||nome===undefined||String(nome).trim()==='')continue;
+       const x=calcInsumo({
+         nome:String(nome).trim(), categoria:'', fornecedor:I.fornecedor>=0?String(row[I.fornecedor]??'').trim():'', ondeComprei:I.onde>=0?String(row[I.onde]??'').trim():'',
+         qtos:I.qtos>=0?num(row[I.qtos]):0, usei:I.usei>=0?num(row[I.usei]):0, lote:I.lote>=0?String(row[I.lote]??'').trim():'',
+         compra:I.compra>=0?excelDateToInput(row[I.compra]):'', fabricacao:I.fab>=0?excelDateToInput(row[I.fab]):'', validade:I.validade>=0?excelDateToInput(row[I.validade]):'',
+         valor:I.valor>=0?num(row[I.valor]):0, peso:I.peso>=0?num(row[I.peso]):0, unidade:I.unidade>=0?String(row[I.unidade]??'').trim():'g'
+       });
+       imported.push(x);
+     }
+     if(!imported.length){alert('Nenhum insumo com nome foi encontrado na planilha.');return;}
+     if(!confirm(`Encontrei ${imported.length} insumos.\n\nIsso vai substituir somente a lista atual de INSUMOS deste cadastro.\nAs outras áreas do sistema não serão alteradas.\n\nDeseja importar?`))return;
+     state.insumos=imported;save();setPage('insumos');alert(`${imported.length} insumos importados com sucesso. A coluna INCI foi ignorada.`);
+   }catch(err){console.error(err);alert('Não consegui ler essa planilha. Confira se é um arquivo Excel válido (.xlsx ou .xls).');}
+ };
+ reader.readAsArrayBuffer(file);
+}
+function openInsumo(i=-1){editingInsumo=i;const x=i>=0?state.insumos[i]:{};document.getElementById('insumoModalTitle').textContent=i>=0?'Editar insumo':'Adicionar insumo';[['iNome',x.nome],['iCategoria',x.categoria],['iFornecedor',x.fornecedor],['iOnde',x.ondeComprei],['iQtos',x.qtos??0],['iUsei',x.usei??0],['iLote',x.lote],['iCompra',x.compra],['iFab',x.fabricacao],['iValidade',x.validade],['iValor',x.valor??0],['iPeso',x.peso??0],['iUnidade',x.unidade||'g']].forEach(([id,v])=>document.getElementById(id).value=v??'');document.getElementById('insumoModal').classList.add('show')}
+function saveInsumoForm(){const x=calcInsumo({nome:document.getElementById('iNome').value.trim(),categoria:document.getElementById('iCategoria').value.trim(),fornecedor:document.getElementById('iFornecedor').value.trim(),ondeComprei:document.getElementById('iOnde').value.trim(),qtos:num(document.getElementById('iQtos').value),usei:num(document.getElementById('iUsei').value),lote:document.getElementById('iLote').value,compra:document.getElementById('iCompra').value,fabricacao:document.getElementById('iFab').value,validade:document.getElementById('iValidade').value,valor:num(document.getElementById('iValor').value),peso:num(document.getElementById('iPeso').value),unidade:document.getElementById('iUnidade').value});if(!x.nome){alert('Digite o nome do insumo.');return}if(editingInsumo>=0)state.insumos[editingInsumo]=x;else state.insumos.push(x);save();closeModal('insumoModal');setPage('insumos')}
+function editInsumo(i){openInsumo(i)}
+function delInsumo(i){if(confirm('Excluir este insumo?')){state.insumos.splice(i,1);save();setPage('insumos')}}
+
+function embalagens(c){
+ const rows=state.embalagens.map((x,i)=>`<tr><td>${esc(x.embalagem)}</td><td>${esc(x.categoria)}</td><td>${esc(x.fornecedor)}</td><td>${num(x.qtdComprada)}</td><td>${num(x.qtdPacote)}</td><td>${esc(x.unidade)}</td><td>${money(x.valorTotal)}</td><td>${money(x.valorFracionado)}</td><td>${num(x.usado)}</td><td>${num(x.estoque)}</td><td><span class="status ${x.status==='COMPRAR'?'buy':'ok'}">${x.status}</span></td><td><button class="btn secondary" onclick="editEmb(${i})">Editar</button> <button class="btn danger" onclick="delEmb(${i})">Excluir</button></td></tr>`).join('');
+ c.innerHTML=`<div class="toolbar"><input id="searchE" class="input search" placeholder="Buscar por embalagem, categoria ou fornecedor" oninput="filterTable('searchE','et')"><div class="actions"><label class="btn secondary" style="cursor:pointer">⬆ Importar EMBALAGENS 2026<input type="file" accept=".xlsx,.xls" hidden onchange="importEmbalagensExcel(event)"></label><button class="btn primary" onclick="openEmb()">＋ Adicionar embalagem</button></div></div><div class="notice"><b>Banco de Embalagens:</b> mesma lógica da planilha: Valor fracionado = Valor total ÷ Qtd. por pacote; Estoque = (Qtd. comprada × Qtd. por pacote) − Usado; COMPRAR quando estoque ≤ 3.</div><div class="tablewrap"><table class="table" id="et"><thead><tr><th>EMBALAGEM</th><th>CATEGORIA</th><th>FORNECEDOR</th><th>QTDE COMPRADA</th><th>QTDE POR PACOTE</th><th>UNIDADE</th><th>VALOR TOTAL</th><th>VALOR FRACIONADO</th><th>USADO</th><th>ESTOQUE</th><th>STATUS</th><th>AÇÕES</th></tr></thead><tbody>${rows||'<tr><td colspan="12" class="empty">Nenhuma embalagem cadastrada. Clique em “Adicionar embalagem” para começar.</td></tr>'}</tbody></table></div>`
+}
+function importEmbalagensExcel(event){
+ const file=event.target.files&&event.target.files[0];if(!file)return;
+ const input=event.target;input.value='';
+ const reader=new FileReader();
+ reader.onload=function(e){
+   try{
+     if(!window.XLSX){alert('Não foi possível carregar o leitor de Excel. Verifique sua conexão com a internet e tente novamente.');return;}
+     const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+     const ws=wb.Sheets[wb.SheetNames[0]];
+     const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
+     if(!rows.length){alert('A planilha está vazia.');return;}
+     const headers=rows[0].map(v=>String(v??'').trim().toLowerCase());
+     const idx=(...names)=>{for(const n of names){const i=headers.indexOf(n.toLowerCase());if(i>=0)return i}return -1};
+     const I={embalagem:idx('embalagem'),categoria:idx('categoria'),fornecedor:idx('fornecedor'),qtdComprada:idx('qtde comprada','qtd. comprada','qtd comprada','quantidade comprada'),qtdPacote:idx('qtde por pacote','qtd. por pacote','qtd por pacote','quantidade por pacote'),unidade:idx('unidade'),valorTotal:idx('valor total'),usado:idx('usado')};
+     if(I.embalagem<0){alert('Não encontrei a coluna “EMBALAGEM” na planilha.');return;}
+     const imported=[];
+     for(let r=1;r<rows.length;r++){
+       const row=rows[r], nome=row[I.embalagem];
+       if(nome===null||nome===undefined||String(nome).trim()==='')continue;
+       imported.push(calcEmb({embalagem:String(nome).trim(),categoria:I.categoria>=0?String(row[I.categoria]??'').trim():'',fornecedor:I.fornecedor>=0?String(row[I.fornecedor]??'').trim():'',qtdComprada:I.qtdComprada>=0?num(row[I.qtdComprada]):0,qtdPacote:I.qtdPacote>=0?num(row[I.qtdPacote]):0,unidade:I.unidade>=0?String(row[I.unidade]??'').trim():'Un.',valorTotal:I.valorTotal>=0?num(row[I.valorTotal]):0,usado:I.usado>=0?num(row[I.usado]):0}));
+     }
+     if(!imported.length){alert('Nenhuma embalagem com nome foi encontrada na planilha.');return;}
+     if(!confirm(`Encontrei ${imported.length} embalagens.\n\nIsso vai substituir somente a lista atual de BANCO DE EMBALAGENS deste cadastro.\nINSUMOS, PREÇO FINAL, DASHBOARD e RECEITAS não serão alterados.\n\nDeseja importar?`))return;
+     state.embalagens=imported;save();setPage('embalagens');alert(`${imported.length} embalagens importadas com sucesso.`);
+   }catch(err){console.error(err);alert('Não consegui ler essa planilha. Confira se é um arquivo Excel válido (.xlsx ou .xls).');}
+ };
+ reader.readAsArrayBuffer(file);
+}
+function openEmb(i=-1){editingEmb=i;const x=i>=0?state.embalagens[i]:{};document.getElementById('embModalTitle').textContent=i>=0?'Editar embalagem':'Adicionar embalagem';[['eNome',x.embalagem],['eCategoria',x.categoria],['eFornecedor',x.fornecedor],['eQtdComprada',x.qtdComprada??0],['eQtdPacote',x.qtdPacote??0],['eUnidade',x.unidade||'Un.'],['eValorTotal',x.valorTotal??0],['eUsado',x.usado??0]].forEach(([id,v])=>document.getElementById(id).value=v??'');document.getElementById('embModal').classList.add('show')}
+function saveEmbForm(){const x=calcEmb({embalagem:document.getElementById('eNome').value.trim(),categoria:document.getElementById('eCategoria').value.trim(),fornecedor:document.getElementById('eFornecedor').value.trim(),qtdComprada:num(document.getElementById('eQtdComprada').value),qtdPacote:num(document.getElementById('eQtdPacote').value),unidade:document.getElementById('eUnidade').value,valorTotal:num(document.getElementById('eValorTotal').value),usado:num(document.getElementById('eUsado').value)});if(!x.embalagem){alert('Digite o nome da embalagem.');return}if(editingEmb>=0)state.embalagens[editingEmb]=x;else state.embalagens.push(x);save();closeModal('embModal');setPage('embalagens')}
+function editEmb(i){openEmb(i)}
+function delEmb(i){if(confirm('Excluir esta embalagem?')){state.embalagens.splice(i,1);save();setPage('embalagens')}}
+
+function filterTable(inputId,tableId){const q=document.getElementById(inputId).value.toLowerCase();document.querySelectorAll('#'+tableId+' tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none')}
+
+function receitaTemplate(nome='',categoria='Sabonetes'){return {id:'r'+Date.now()+Math.random().toString(36).slice(2,7),nome,categoria,precos:[],precificacao:{quantidadeProduzida:1,custoFixo:2.5,lucroDesejado:1.2,embalagens:[],qtdEmbalagem:1}}}
+function persistActiveRecipe(){const r=state.receitas.find(x=>x.id===state.receitaAtiva);if(!r)return;r.precos=(window.recipeRows||[]).map(x=>({...x}));r.precificacao={...state.precificacao,embalagens:[...(state.precificacao.embalagens||[])]};state.precos=r.precos;save()}
+function loadRecipe(id){const r=state.receitas.find(x=>x.id===id);if(!r)return;state.receitaAtiva=id;state.precos=(r.precos||[]).map(x=>({...x}));state.precificacao={...structuredClone(EMPTY.precificacao),...(r.precificacao||{}),embalagens:Array.isArray(r.precificacao?.embalagens)?[...r.precificacao.embalagens]:[]};save()}
+function openRecipeModal(categoria){
+ const modal=document.getElementById('recipeModal');
+ const name=document.getElementById('recipeNameInput');
+ const cat=document.getElementById('recipeCategoryInput');
+ cat.innerHTML=CATEGORIAS_RECEITAS.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+ cat.value=CATEGORIAS_RECEITAS.includes(categoria)?categoria:(CATEGORIAS_RECEITAS[0]||'Sabonetes');
+ name.value='';
+ hideMsg('recipeModalMsg');
+ modal.classList.add('show');
+ setTimeout(()=>name.focus(),50);
+}
+function closeRecipeModal(){document.getElementById('recipeModal').classList.remove('show')}
+function saveRecipeModal(){
+ const name=document.getElementById('recipeNameInput').value.trim();
+ const cat=document.getElementById('recipeCategoryInput').value;
+ if(!name){showMsg('recipeModalMsg','Digite o nome da receita.');document.getElementById('recipeNameInput').focus();return;}
+ const r=receitaTemplate(name,cat);
+ state.receitas.push(r);
+ loadRecipe(r.id);
+ closeRecipeModal();
+ save();
+ setPage('preco');
+}
+function newRecipe(){openRecipeModal('Sabonetes')}
+function deleteRecipe(id){const r=state.receitas.find(x=>x.id===id);if(!r)return;if(!confirm('Excluir a receita "'+r.nome+'"?'))return;state.receitas=state.receitas.filter(x=>x.id!==id);state.receitaAtiva=state.receitas[0]?.id||null;if(state.receitaAtiva)loadRecipe(state.receitaAtiva);else{state.precos=[];state.precificacao=structuredClone(EMPTY.precificacao);save()}setPage('receitas')}
+function openRecipe(id){persistActiveRecipe();loadRecipe(id);setPage('preco')}
+function velasPage(c){
+ const cards=CATEGORIAS_VELAS.map((cat,i)=>{
+   const list=state.receitas.filter(r=>r.categoria===cat);
+   const icons=['🥫','🥃','🪨','🕯️'];
+   return `<div class=\"candleCard\"><div><div class=\"candleIcon\">${icons[i]}</div><h3>${cat}</h3><p>${list.length?list.length+' receita(s) cadastrada(s)':'Cadastre a primeira receita desta linha.'}</p></div><div class=\"actions\"><button class=\"btn primary\" onclick=\"openRecipeCategory('${esc(cat)}')\">${list.length?'Ver receitas':'Criar receita'}</button></div></div>`;
+ }).join('');
+ c.innerHTML=`<div class=\"candleHero\"><div class=\"label\">DONA DE MIM • VELAS ARTESANAIS</div><h2>🕯️ Receitas de Velas</h2><p>Um espaço especial para organizar as receitas das suas velas, mantendo tudo dentro do mesmo sistema de produção e precificação.</p></div><div class=\"candleCards\">${cards}</div><div class=\"panel\"><div class=\"toolbar\"><div><h2 style=\"font-family:Georgia,serif;margin:0\">Nova receita de vela</h2><p class=\"small\">Escolha uma das quatro linhas para começar.</p></div><button class=\"btn primary\" onclick=\"openRecipeModal('Velas Latinha')\">＋ Nova receita</button></div></div>`;
+}
+function receitasPage(c){const groups=CATEGORIAS_RECEITAS.map(cat=>{const list=state.receitas.filter(r=>r.categoria===cat);return `<div class="panel" style="margin-bottom:14px"><div class="toolbar"><h2 style="font-family:Georgia,serif;margin:0">${cat}</h2><button class="btn primary" onclick="newRecipe()">＋ Nova receita</button></div>${list.length?`<div class="grid">${list.map(r=>`<div class="card"><div class="label">${esc(r.nome)}</div><div class="small">${(r.precos||[]).length} insumo(s)</div><div class="actions" style="margin-top:12px"><button class="btn secondary" onclick="openRecipe('${r.id}')">Abrir no Preço Final</button><button class="btn danger" onclick="deleteRecipe('${r.id}')">Excluir</button></div></div>`).join('')}</div>`:'<div class="empty">Nenhuma receita nesta categoria.</div>'}</div>`}).join('');c.innerHTML=`<div class="toolbar"><div><div class="label">Suas receitas ficam salvas separadamente.</div><h2 style="font-family:Georgia,serif;margin:4px 0">Minhas Receitas</h2></div><button class="btn primary" onclick="newRecipe()">＋ Nova receita</button></div>${groups}`}
+function preco(c){
+ if(!state.receitas.length){c.innerHTML='<div class="panel"><h2 style="font-family:Georgia,serif">Minhas Receitas</h2><p>Crie sua primeira receita para começar a precificação.</p><button class="btn primary" onclick="newRecipe()">＋ Nova receita</button></div>';return;}
+ if(!state.receitaAtiva || !state.receitas.some(r=>r.id===state.receitaAtiva)) state.receitaAtiva=state.receitas[0].id;
+ const active=state.receitas.find(r=>r.id===state.receitaAtiva);
+ state.precos=(active.precos||[]).map(x=>({...x})); state.precificacao={...structuredClone(EMPTY.precificacao),...(active.precificacao||{}),embalagens:Array.isArray(active.precificacao?.embalagens)?[...active.precificacao.embalagens]:[]};
+ const names=[...new Set(state.insumos.map(x=>String(x.nome||'').trim()).filter(Boolean))];
+ const embNames=[...new Set(state.embalagens.map(x=>String(x.embalagem||'').trim()).filter(Boolean))];
+ window.recipeOptions=names;
+ c.innerHTML=`<div class="panel">
+  <h2 style="font-family:Georgia,serif">Composição da receita</h2>
+  <div class="field" style="max-width:520px;margin:12px 0"><label>Receita</label><select class="select" onchange="changeActiveRecipe(this.value)">${state.receitas.map(r=>`<option value="${esc(r.id)}" ${r.id===state.receitaAtiva?'selected':''}>${esc(r.nome)} — ${esc(r.categoria)}</option>`).join('')}</select></div>
+  <div class="notice"><b>Seguindo a planilha:</b> o preço fracionado vem do cadastro de Insumos. Para unidade <b>g</b>, custo = quantidade × preço fracionado. Para <b>ml</b>, o cálculo usa também o fator ml→g da linha.</div>
+  <div class="tablewrap"><table class="table"><thead><tr><th>INSUMO</th><th>Quantidade usada</th><th>Unidade</th><th>Preço fracionado</th><th>Custo na receita</th><th></th></tr></thead><tbody id="recipeRows"></tbody></table></div>
+  <div class="actions" style="margin-top:14px"><button class="btn secondary" onclick="addRecipeRow()">＋ Adicionar insumo</button></div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+  <div class="grid"><div class="card"><div class="label">Peso final</div><div class="metric" id="pesoFinal">0 g</div></div><div class="card"><div class="label">Custo total dos insumos</div><div class="metric" id="recipeTotal">R$ 0,00</div></div></div>
+ </div>
+ <div class="panel" style="margin-top:18px">
+  <h2 style="font-family:Georgia,serif">Embalagens</h2>
+  <div class="notice"><b>Seguindo a planilha:</b> cada embalagem é escolhida no Banco de Embalagens e o sistema busca automaticamente o <b>valor fracionado</b>. O total das embalagens é esse custo multiplicado pela quantidade usada.</div>
+  <div class="tablewrap"><table class="table"><thead><tr><th>EMBALAGEM</th><th>CUSTO</th></tr></thead><tbody id="embRecipeRows"></tbody></table></div>
+  <div class="formgrid" style="margin-top:12px"><div class="field"><label>Quantidade usada</label><input id="embRecipeQty" class="input" type="number" min="0" step="0.01"></div></div>
+  <div class="right" style="margin-top:12px"><div class="label">TOTAL EMBALAGEM</div><div class="metric" id="embTotal">R$ 0,00</div></div>
+ </div>
+ <div class="panel" style="margin-top:18px">
+  <h2 style="font-family:Georgia,serif">Resultado da precificação</h2>
+  <div class="formgrid">
+   <div class="field"><label>Quantidade produzida</label><input id="qtdProduzida" class="input" type="number" min="0" step="0.01"></div>
+   <div class="field"><label>Custo fixo</label><input id="custoFixo" class="input" type="number" min="0" step="0.01"></div>
+   <div class="field"><label>Lucro desejado (%)</label><input id="lucroDesejado" class="input" type="number" min="0" step="0.01"></div>
+  </div>
+  <div class="grid" style="margin-top:16px">
+   <div class="card"><div class="label">Custo total</div><div class="metric" id="resCustoTotal">R$ 0,00</div></div>
+   <div class="card"><div class="label">Custo por unidade</div><div class="metric" id="resCustoUnit">R$ 0,00</div></div>
+   <div class="card"><div class="label">Custo da embalagem</div><div class="metric" id="resCustoEmb">R$ 0,00</div></div>
+   <div class="card"><div class="label">Preço de venda sugerido</div><div class="metric" id="resPrecoVenda">R$ 0,00</div></div>
+  </div>
+ </div>`;
+ if(!window.recipeRows) window.recipeRows=[];
+ window.recipeRows=state.precos.map(r=>({...r}));
+ if(!window.recipeRows.length && names.length) window.recipeRows.push({insumo:names[0],quantidade:0,unidade:'g',fatorMl:1});
+ state.precificacao.embalagens=(state.precificacao.embalagens||[]).slice(0,7);
+ while(state.precificacao.embalagens.length<7) state.precificacao.embalagens.push('');
+ document.getElementById('embRecipeQty').value=state.precificacao.qtdEmbalagem??1;
+ document.getElementById('qtdProduzida').value=state.precificacao.quantidadeProduzida??1;
+ document.getElementById('custoFixo').value=state.precificacao.custoFixo??2.5;
+ document.getElementById('lucroDesejado').value=((state.precificacao.lucroDesejado??1.2)*100);
+ document.getElementById('qtdProduzida').onchange=()=>priceSettingChange('qtdProduzida','quantidadeProduzida');
+ document.getElementById('custoFixo').onchange=()=>priceSettingChange('custoFixo','custoFixo');
+ document.getElementById('lucroDesejado').onchange=()=>priceSettingChange('lucroDesejado','lucroDesejado',v=>num(v)/100);
+ renderRecipeRows();renderPackagingRows();calcRecipe();
+}
+function changeActiveRecipe(id){persistActiveRecipe();loadRecipe(id);setPage('preco')}
+function addRecipeRow(){const names=[...new Set(state.insumos.map(x=>String(x.nome||'').trim()).filter(Boolean))];window.recipeRows.push({insumo:names[0]||'',quantidade:0,unidade:'g',fatorMl:1});state.precos=window.recipeRows.map(r=>({...r}));persistActiveRecipe();renderRecipeRows()}
+function renderRecipeRows(){const box=document.getElementById('recipeRows');if(!box)return;box.innerHTML=(window.recipeRows||[]).map((r,i)=>{const opts=(window.recipeOptions||[]).map(n=>`<option value="${esc(n)}" ${r.insumo===n?'selected':''}>${esc(n)}</option>`).join('');const x=state.insumos.find(a=>a.nome===r.insumo);const pf=x?num(x.precoFracionado):0;const custo=calcRowCost(r,x);return `<tr><td><select class="select" onchange="recipeChange(${i},'insumo',this.value)"><option value="">Selecione um insumo</option>${opts}</select></td><td><input class="input" type="number" min="0" step="0.01" value="${r.quantidade??0}" onchange="recipeChange(${i},'quantidade',this.value)"></td><td><select class="select" onchange="recipeChange(${i},'unidade',this.value)"><option value="g" ${r.unidade==='g'?'selected':''}>g</option><option value="ml" ${r.unidade==='ml'?'selected':''}>ml</option><option value="un" ${r.unidade==='un'?'selected':''}>un</option></select></td><td>${money(pf)}${r.unidade==='ml'?`<div style="margin-top:6px"><input class="input" type="number" min="0" step="0.0001" value="${r.fatorMl??1}" title="Fator ml→g" onchange="recipeChange(${i},'fatorMl',this.value)"><small>Fator ml→g</small></div>`:''}</td><td>${money(custo)}</td><td><button class="btn danger" onclick="removeRecipeRow(${i})">Excluir</button></td></tr>`}).join('')||'<tr><td colspan="6" class="empty">Cadastre pelo menos um insumo para montar a receita.</td></tr>'}
+function removeRecipeRow(i){window.recipeRows.splice(i,1);state.precos=window.recipeRows.map(r=>({...r}));persistActiveRecipe();renderRecipeRows();calcRecipe()}
+function recipeChange(i,k,v){if(!window.recipeRows[i])return;window.recipeRows[i][k]=k==='quantidade'||k==='fatorMl'?num(v):v;state.precos=window.recipeRows.map(r=>({...r}));persistActiveRecipe();renderRecipeRows();calcRecipe()}
+function calcRowCost(r,x){if(!x||!r.insumo)return 0;const q=num(r.quantidade),pf=num(x.precoFracionado);return r.unidade==='ml'?q*num(r.fatorMl??1)*pf:q*pf}
+function renderPackagingRows(){const box=document.getElementById('embRecipeRows');if(!box)return;const selected=state.precificacao.embalagens||[];box.innerHTML=selected.map((name,i)=>{const opts=state.embalagens.map(x=>{const n=String(x.embalagem||'').trim();return `<option value="${esc(n)}" ${name===n?'selected':''}>${esc(n)}</option>`}).join('');const e=state.embalagens.find(x=>x.embalagem===name);return `<tr><td><select class="select" onchange="packChange(${i},this.value)"><option value="">Selecione uma embalagem</option>${opts}</select></td><td>${money(e?num(e.valorFracionado):0)}</td></tr>`}).join('')||'<tr><td colspan="2" class="empty">Cadastre embalagens no Banco de Embalagens.</td></tr>';const q=document.getElementById('embRecipeQty');if(q){q.onchange=()=>{state.precificacao.qtdEmbalagem=num(q.value);save();calcRecipe()}}
+}
+function packChange(i,v){state.precificacao.embalagens[i]=v;persistActiveRecipe();renderPackagingRows();calcRecipe()}
+function calcRecipe(){
+ let total=0,peso=0;
+ for(const r of window.recipeRows||[]){
+   const x=state.insumos.find(a=>a.nome===r.insumo);
+   total+=calcRowCost(r,x);
+   peso+=num(r.quantidade);
+ }
+ const embQty=num(state.precificacao.qtdEmbalagem??1);
+ let embUnitTotal=0;
+ for(const name of state.precificacao.embalagens||[]){
+   const e=state.embalagens.find(x=>x.embalagem===name);
+   if(e) embUnitTotal+=num(e.valorFracionado);
+ }
+ // Mesma lógica da planilha: TOTAL EMBALAGEM = soma dos custos das embalagens x quantidade usada.
+ const embTotal=embUnitTotal*embQty;
+ const qtdProd=num(state.precificacao.quantidadeProduzida??1);
+ // Mesma fórmula da célula E29 da planilha: custo dos insumos / quantidade produzida.
+ const custoUnit=qtdProd===0?0:total/qtdProd;
+ const fixo=num(state.precificacao.custoFixo??2.5);
+ // No site o lucro fica armazenado como decimal: 100% = 1; 120% = 1,2; 150% = 1,5.
+ let lucro=num(state.precificacao.lucroDesejado??1.2);
+ if(lucro>5) lucro=lucro/100;
+ // Mesma fórmula da célula E33 da planilha:
+ // (custo por unidade x (1 + lucro)) + (custo fixo / quantidade produzida) + custo das embalagens.
+ const venda=qtdProd===0?0:(custoUnit*(1+lucro))+(fixo/qtdProd)+embTotal;
+ const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+ set('pesoFinal',peso.toLocaleString('pt-BR',{maximumFractionDigits:2})+' g');
+ set('recipeTotal',money(total));
+ set('embTotal',money(embTotal));
+ set('resCustoTotal',money(total));
+ set('resCustoUnit',money(custoUnit));
+ set('resCustoEmb',money(embTotal));
+ set('resPrecoVenda',money(venda));
+}
+function priceSettingChange(id,key,transform){const el=document.getElementById(id);if(!el)return;state.precificacao[key]=transform?transform(el.value):num(el.value);persistActiveRecipe();calcRecipe()}
+
+function config(c){c.innerHTML=`<div class="panel"><h2 style="font-family:Georgia,serif">Meu cadastro</h2><p>Você está conectada como <b>${esc(currentUser.name)}</b> (${esc(currentUser.email)}).</p><div class="notice">☁️ Seus dados deste cadastro são sincronizados com a nuvem quando houver conexão.</div><div class="actions"><button class="btn secondary" onclick="exportBackup()">⬇ Exportar backup</button><label class="btn secondary">⬆ Restaurar backup<input type="file" accept=".json" hidden onchange="restoreBackup(event)"></label><button class="btn danger" onclick="clearAll()">Apagar dados deste cadastro</button></div></div>`}
+function exportBackup(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-saboaria-dona-de-mim.json';a.click();URL.revokeObjectURL(a.href)}
+function restoreBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);save();setPage('dashboard');alert('Backup restaurado.')}catch{alert('Arquivo de backup inválido.')}};r.readAsText(f)}
+function clearAll(){if(confirm('Apagar todos os dados deste cadastro na nuvem e neste navegador?')){state=structuredClone(EMPTY);saveLocal();syncCloud();setPage('dashboard')}}
+
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+initCloud()
+</script>
+</body>
+</html>
